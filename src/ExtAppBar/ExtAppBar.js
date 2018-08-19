@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import QuerySelectBox from '../QuerySelectBox/QuerySelectBox';
 
@@ -22,14 +21,28 @@ export default class ExtAppBar extends Component {
   render() {
     
     return (
-      <AppBar position="static" color="default">
-        <div align='right'>
-          <QuerySelectBox align='right' containerSide="right" className={styles.menuButton} queryList={this.props.queryList} onQuerySelectHandler={this.props.onQuerySelectHandler}/>
-        </div>
+      <AppBar position="static" color="default">  
+       <br/>
         <Typography align='center' variant="title" color="inherit">
-          Current Link Type - {this.props.linkType}
+          Work Items Linking Tool
         </Typography>
-        <QuerySelectBox   containerSide="left" queryList={this.props.queryList} onQuerySelectHandler={this.props.onQuerySelectHandler}/>
+        <Typography align='center' variant="subheading" color="inherit">
+         (Default link - related | Hold down Ctrl - Child of | Hold down Shift - Parent of)
+        </Typography>
+        <QuerySelectBox 
+          align='right' 
+          queryId = {this.props.rightQueryId}
+          containerSide="right" 
+          className={styles.menuButton} 
+          queryList={this.props.queryList} 
+          onQuerySelectHandler={this.props.onQuerySelectHandler}
+        />
+        <QuerySelectBox   
+          queryId = {this.props.leftQueryId}
+          containerSide="left" 
+          queryList={this.props.queryList} 
+          onQuerySelectHandler={this.props.onQuerySelectHandler}
+          />
     </AppBar>
     )
   }

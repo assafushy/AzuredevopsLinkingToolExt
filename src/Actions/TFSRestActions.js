@@ -22,7 +22,7 @@ export default class TFSRestActions {
 
   async getQueryResultsById(id){
     let queryResults = await this.wiClient.queryById(id);
-    console.log(`queryResults : ${JSON.stringify(queryResults)}`)
+    // console.log(`queryResults : ${JSON.stringify(queryResults)}`)
     return queryResults;
   }//getQueryResultsById
 
@@ -34,11 +34,12 @@ export default class TFSRestActions {
       return{
         id: wiData.id,
         title: wiData.fields["System.Title"],
-        type:wiData.fields["System.WorkItemType"]
+        type:wiData.fields["System.WorkItemType"],
+        url:wiData.url
       } 
     }));
 
-    console.log(`populated wi array : ${JSON.stringify(wiPopulatedArray)}`);
+    // console.log(`populated wi array : ${JSON.stringify(wiPopulatedArray)}`);
     return wiPopulatedArray;
   }
 
@@ -55,7 +56,7 @@ export default class TFSRestActions {
   
           let queryListObject = [];
   
-          console.log(`name of query root :${sharedQueriesArray[0].children}`);
+          // console.log(`name of query root :${sharedQueriesArray[0].children}`);
           
           sharedQueriesArray[0].children.forEach((query)=>{
             
@@ -83,7 +84,7 @@ export default class TFSRestActions {
             // console.log("---")
             
           })//foreach
-          console.log(queryListObject);
+          // console.log(queryListObject);
           resolve(queryListObject);
        });//VSS.require
     })//Promise
@@ -105,7 +106,7 @@ export default class TFSRestActions {
           }
         ],wi1); 
       }catch(error){
-        console.log(JSON.stringify(error))
+        // console.log(JSON.stringify(error))
         success(null,null,error);
         return false;
       }   

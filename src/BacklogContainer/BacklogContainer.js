@@ -66,6 +66,7 @@ export default class BacklogContainer extends Component {
                     e.stopPropagation();
                     e.preventDefault();}}
                   onDrop={(e)=>{this.props.handleDropEvent()}}
+                  onDragEnd={(e)=>{this.props.onDragExit(null,null,null)}}
                   >
                 <ListItem button component="a" href="#simple-list">
                 <div ><img height="20" width="20" src={img} /></div>

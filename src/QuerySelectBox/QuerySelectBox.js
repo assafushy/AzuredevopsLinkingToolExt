@@ -7,7 +7,7 @@ import Select from '@material-ui/core/Select';
 export default class QuerySelectBox extends Component {
   
   menuItemFactory(queryList){
-   console.log(queryList)
+   //console.log(queryList)
     if(queryList){
       return queryList.map((listItem)=>{
         return <MenuItem value={listItem.id}>{listItem.queryName}</MenuItem>;
@@ -20,11 +20,10 @@ export default class QuerySelectBox extends Component {
   render() {
     return (
       <div>
-        <InputLabel htmlFor="age-simple">Query Select</InputLabel>
+        <InputLabel htmlFor="age-simple">Selected query {this.props.containerSide} :  </InputLabel>
         <Select
-          value={10}
+          value={this.props.queryId}
           onChange={(event)=>{
-                            console.log(`selected query id : ${event.target.value}`);
                             this.props.onQuerySelectHandler(event.target.value,this.props.containerSide);
                           }}
         >

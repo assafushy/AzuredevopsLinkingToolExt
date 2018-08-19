@@ -21,6 +21,8 @@ export default class DragAndDropPage extends Component {
 
     this.state = {
       'queryList' : null,
+      'leftQueryId':null,
+      'rightQueryId':null,
       'leftContainerWiArray': null,
       'rightContainerWiArray': null,
       'linkDescription':'Related',
@@ -33,19 +35,28 @@ export default class DragAndDropPage extends Component {
   render(){
     return(
       <div>
-        <ExtAppBar queryList={this.state.queryList} linkType={this.state.linkDescription} onQuerySelectHandler={this.onQuerySelectHandler.bind(this)}/>
+        <ExtAppBar 
+          queryList={this.state.queryList} 
+          leftQueryId={this.state.leftQueryId}
+          rightQueryId={this.state.rightQueryId}
+          linkType={this.state.linkDescription} 
+          onQuerySelectHandler={this.onQuerySelectHandler.bind(this)}
+          />
         <Grid  container spacing={0}>
           <Grid item xs={6}>
            <BacklogContainer  handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
                               handleDragEvent={this.handleDragEvent.bind(this)} 
                               handleDropEvent={this.handleDropEvent.bind(this)}
+                              onDragExit={this.successfulLink.bind(this)}
                               wiArray ={this.state.leftContainerWiArray}/>
           </Grid>
           <Grid item xs={6}>
           <BacklogContainer   handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
                               handleDragEvent={this.handleDragEvent.bind(this)} 
                               handleDropEvent={this.handleDropEvent.bind(this)}
-                              wiArray ={this.state.rightContainerWiArray}/>
+                              wiArray ={this.state.rightContainerWiArray}
+                              onDragExit={this.successfulLink.bind(this)}
+                              />
           </Grid>
         </Grid>
 
@@ -69,34 +80,38 @@ export default class DragAndDropPage extends Component {
 
   onCloseSuccessSnackBar(){
     this.setState({openSuccessSnackBar:false});
-  }
+  }//onCloseSuccessSnackBar
 
   successfulLink(wi1,wi2,error){
     if(error){
       this.successMessage = `Error on link attempt!`;
       this.setState({openSuccessSnackBar:true});
+      this.setState({openDragSnackBar:false});
       return false;
     }//if
-
+    if(wi1 === null && wi2 === null){
+      this.setState({openDragSnackBar:false});
+      return false
+    }
     this.successMessage = `sucessfully link ${wi1} to ${wi2}`;
     this.setState({openSuccessSnackBar:true});
-  }
+  }//successfulLink
   
   handleKeyDown(key){
-    console.log(key)
+    // console.log(key)
     switch (key) {
-      case 'Alt':
-        console.log(`pressed: ${key} alt`);
+      case 'Shift':
+        // console.log(`pressed: ${key} alt`);
         this.linkType = 'Hierarchy-Reverse';
-        this.setState({linkDescription:'Child of'});
-        break;
-      case 'Control':
-        console.log(`pressed: ${key} Ctrl`);
-        this.linkType = 'Hierarchy-Forward';
         this.setState({linkDescription:'Parent of'});
         break;
+      case 'Control':
+        // console.log(`pressed: ${key} Ctrl`);
+        this.linkType = 'Hierarchy-Forward';
+        this.setState({linkDescription:'Child of'});
+        break;
       default:
-        console.log(`defualt press`);
+        // console.log(`defualt press`);
         this.linkType = 'Related';
         this.setState({linkDescription:'Related'});
         break;
@@ -104,8 +119,6 @@ export default class DragAndDropPage extends Component {
   }//handleKeyDown
 
   handleDragEvent(id,ctrlKey,altKey,shiftKey){
-    //console.log(`dragging: ${id}`);
-    //console.log(`control click: ${ctrlKey} Alt click: ${altKey} ShiftClick: ${shiftKey}`);
     this.darggedItemId = id;
     if(ctrlKey){this.handleKeyDown('Control');}else{
       if(altKey){this.handleKeyDown('Alt');}else{
@@ -119,7 +132,7 @@ export default class DragAndDropPage extends Component {
   }//handleDragEvent
 
   handleDragOverEvent(id){
-    console.log(`dargged over: ${id}`)
+    //console.log(`dargged over: ${id}`)
     this.overItemId = id;
   }//handleDragOverEvent
 
@@ -130,6 +143,7 @@ export default class DragAndDropPage extends Component {
     this.setState({openDragSnackBar:false});
     this.darggedItemId = null;
     this.overItemId = null;
+
   }//handleDropEvent
   
   async onQuerySelectHandler(id,conatainerSide){
@@ -140,8 +154,10 @@ export default class DragAndDropPage extends Component {
     //console.log(wiArray)
     if(conatainerSide === "left"){
       this.setState({'leftContainerWiArray':wiArray});
+      this.setState({'leftQueryId':id});
     }else{
       this.setState({'rightContainerWiArray':wiArray});
+      this.setState({'rightQueryId':id});
     }//if
   }//onQuerySelectHandler
 }
