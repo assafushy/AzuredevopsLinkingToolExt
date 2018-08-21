@@ -30,12 +30,12 @@ export default class TFSRestActions {
     let wiPopulatedArray = [];
     wiPopulatedArray = await Promise.all(resultsArray.map(async (wi)=>{
       let wiData = await this.wiClient.getWorkItem(wi.id);
-      //console.log(JSON.stringify(wiData));
+      // console.log(JSON.stringify(wiData));
       return{
         id: wiData.id,
         title: wiData.fields["System.Title"],
         type:wiData.fields["System.WorkItemType"],
-        url:wiData.url
+        url:wiData._links.html.href
       } 
     }));
 

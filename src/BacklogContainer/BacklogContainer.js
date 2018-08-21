@@ -57,7 +57,7 @@ export default class BacklogContainer extends Component {
       return wiArray.map((wi)=>{
 
         let img = this.imgSelector(wi.type);
-
+        // console.log(wi.url)
         return  <div
                   draggable
                   onDragStart={(e)=>{this.props.handleDragEvent(wi.id,e.ctrlKey,e.altKey,e.shiftKey)}}                    
@@ -68,9 +68,10 @@ export default class BacklogContainer extends Component {
                   onDrop={(e)=>{this.props.handleDropEvent()}}
                   onDragEnd={(e)=>{this.props.onDragExit(null,null,null)}}
                   >
+               
                 <ListItem button component="a" href="#simple-list">
                 <div ><img height="20" width="20" src={img} /></div>
-                  <ListItemText primary={wi.title} />
+                <a target="_blank" rel="noopener noreferrer" href={wi.url}><ListItemText primary={`#${wi.id} - ${wi.title}`} /> </a>
                 </ListItem>
                 <Divider/>
                 </div>;
