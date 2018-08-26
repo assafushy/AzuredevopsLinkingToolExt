@@ -102,18 +102,18 @@ export default class App extends Component {
     switch (key) {
       case 'Shift':
         // console.log(`pressed: ${key} alt`);
-        this.linkType = 'Hierarchy-Reverse';
-        this.setState({linkDescription:'Parent of'});
+        this.linkType = 'Elisra.CoveredBy-Forward';
+        this.setState({linkDescription:'Covers'});
         break;
       case 'Control':
         // console.log(`pressed: ${key} Ctrl`);
-        this.linkType = 'Hierarchy-Forward';
-        this.setState({linkDescription:'Child of'});
+        this.linkType = 'Microsoft.VSTS.Common.TestedBy-Reverse';
+        this.setState({linkDescription:'Tests'});
         break;
       default:
         // console.log(`defualt press`);
-        this.linkType = 'Related';
-        this.setState({linkDescription:'Related'});
+        this.linkType = 'System.LinkTypes.Hierarchy-Forward';
+        this.setState({linkDescription:'Child of'});
         break;
     }
   }//handleKeyDown
@@ -139,7 +139,7 @@ export default class App extends Component {
   async handleDropEvent(){
     await tfsData.addLinkToWi(this.overItemId,this.darggedItemId,this.linkType,this.successfulLink.bind(this));
     
-    this.setState({linkDescription:'Related'});
+    this.setState({linkDescription:'Child of'});
     this.setState({openDragSnackBar:false});
     this.darggedItemId = null;
     this.overItemId = null;

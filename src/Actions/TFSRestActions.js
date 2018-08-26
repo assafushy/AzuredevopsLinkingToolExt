@@ -92,12 +92,18 @@ export default class TFSRestActions {
 
   async addLinkToWi(wi1,wi2,linkType,success){
     try{
+
+      
+   
+      // tested by - ctrl
+      // need to display links count by type
+      
       await this.wiClient.updateWorkItem(
         [{
           "op": "add",
           "path": "/relations/-",
           "value": {
-            "rel": `System.LinkTypes.${linkType}`,
+            "rel": `${linkType}`,
             "url": `https://assafushy.visualstudio.com/_apis/wit/workItems/${wi2}`,
             "attributes": {
               "comment": "Making a new link for the dependency"
