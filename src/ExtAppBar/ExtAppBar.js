@@ -27,7 +27,7 @@ export default class ExtAppBar extends Component {
           Work Items Linking Tool
         </Typography>
         <Typography align='center' variant="subheading" color="inherit">
-         (Default link - related | Hold down Ctrl - Child of | Hold down Shift - Parent of)
+         (Default link - Child of | Hold down Ctrl - Tests | Hold down Shift - Covers)
         </Typography>
         <QuerySelectBox 
           align='right' 

@@ -5,6 +5,9 @@ import ExtAppBar from './ExtAppBar/ExtAppBar';
 import BacklogContainer from './BacklogContainer/BacklogContainer';
 import TFSRestActions from './Actions/TFSRestActions';
 import Snackbar from '@material-ui/core/Snackbar';
+import 'react-sortable-tree/style.css';
+import SortableTree from 'react-sortable-tree';
+import DirectLinksContainer from './DirectLinksContainer/DirectLinksContainer'
 
 let tfsData = new TFSRestActions();
     
@@ -12,8 +15,9 @@ export default class App extends Component {
   
   constructor(props) {
     super(props)
+   
     tfsData.fetchSharedQueriesData().then((queryList)=>{this.setState({"queryList":queryList})});
-    
+
     this.darggedItemId = null;
     this.overItemId = null;
     this.linkType = 'Related';
@@ -21,6 +25,8 @@ export default class App extends Component {
 
     this.state = {
       'queryList' : null,
+      'leftQueryResultType':null,
+      'rightQueryResultType':null,
       'leftQueryId':null,
       'rightQueryId':null,
       'leftContainerWiArray': null,
@@ -28,10 +34,44 @@ export default class App extends Component {
       'linkDescription':'Related',
       'openDragSnackBar':false,
       'openSuccessSnackBar':false
-
     }
   }//constructor
     
+
+  leftContainerFactory(queryResultType){
+    switch (queryResultType) {
+      case 1:
+       return  <BacklogContainer  
+                handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
+                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDropEvent={this.handleDropEvent.bind(this)}
+                onDragExit={this.successfulLink.bind(this)}
+                wiArray ={this.state.leftContainerWiArray}/> 
+      case 2:
+        return <DirectLinksContainer/>;
+        break;
+      default:
+        break;
+    }
+  }
+
+  rightContainerFactory(queryResultType){
+    switch (queryResultType) {
+      case 1:
+       return <BacklogContainer   handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
+                                  handleDragEvent={this.handleDragEvent.bind(this)} 
+                                  handleDropEvent={this.handleDropEvent.bind(this)}
+                                  wiArray ={this.state.rightContainerWiArray}
+                                  onDragExit={this.successfulLink.bind(this)}
+                                  />
+      case 2:
+          return <DirectLinksContainer/>;
+          break;
+      default:
+        break;
+    }
+  }
+
   render(){
     return(
       <div>
@@ -42,21 +82,13 @@ export default class App extends Component {
           linkType={this.state.linkDescription} 
           onQuerySelectHandler={this.onQuerySelectHandler.bind(this)}
           />
+
         <Grid  container spacing={0}>
           <Grid item xs={6}>
-           <BacklogContainer  handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
-                              handleDragEvent={this.handleDragEvent.bind(this)} 
-                              handleDropEvent={this.handleDropEvent.bind(this)}
-                              onDragExit={this.successfulLink.bind(this)}
-                              wiArray ={this.state.leftContainerWiArray}/>
+            {this.leftContainerFactory(this.state.leftQueryResultType)}
           </Grid>
           <Grid item xs={6}>
-          <BacklogContainer   handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
-                              handleDragEvent={this.handleDragEvent.bind(this)} 
-                              handleDropEvent={this.handleDropEvent.bind(this)}
-                              wiArray ={this.state.rightContainerWiArray}
-                              onDragExit={this.successfulLink.bind(this)}
-                              />
+            {this.rightContainerFactory(this.state.rightQueryResultType)}
           </Grid>
         </Grid>
 
@@ -149,15 +181,21 @@ export default class App extends Component {
   async onQuerySelectHandler(id,conatainerSide){
     //console.log(conatainerSide);
     let queryResults = await tfsData.getQueryResultsById(id);
+   
     //console.log(queryResults);
-    let wiArray = await tfsData.populateQueryResult(queryResults.workItems);
+    let wiArray = await tfsData.populateQueryResult(queryResults);
+    
     //console.log(wiArray)
     if(conatainerSide === "left"){
+      this.setState({'leftQueryResultType':queryResults.queryResultType});
       this.setState({'leftContainerWiArray':wiArray});
       this.setState({'leftQueryId':id});
+      console.log(`leftQueryResult Type is : ${this.state.leftQueryResultType}`);
     }else{
+      this.setState({'rightQueryResultType':queryResults.queryResultType});
       this.setState({'rightContainerWiArray':wiArray});
       this.setState({'rightQueryId':id});
     }//if
+
   }//onQuerySelectHandler
 }

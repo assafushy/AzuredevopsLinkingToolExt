@@ -3,16 +3,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
-import bugImg from './img/bugImg.png';  
-import changeImg from './img/changeImg.png';  
-import epicImg from './img/epicImg.png';  
-import featImg from './img/featImg.png';  
-import issuImg from './img/issuImg.png';  
-import reqImg from './img/reqImg.png';  
-import reviewImg from './img/reviewImg.png';  
-import riskImg from './img/riskImg.png';  
-import taskImg from './img/taskImg.png';  
-import testImg from './img/testImg.png';  
+import {imgSelector} from '../Actions/ImgGenerator'
 
 // WorkItem ICD :
 //   ID: Number
@@ -23,40 +14,12 @@ import testImg from './img/testImg.png';
 
 export default class BacklogContainer extends Component {
  
-  imgSelector(wiType){
-    
-    switch (wiType) {
-      case 'Bug':
-        return bugImg;
-      case 'Change Request':
-        return changeImg;
-      case 'Epic':
-        return epicImg;
-      case 'Feature':
-        return featImg;
-      case 'Issue':
-        return issuImg;
-      case 'Requirement':
-        return reqImg;
-      case 'Review':
-        return reviewImg;
-      case 'Risk':
-        return riskImg;
-      case 'Task':
-         return taskImg;
-      case 'Test Case':
-        return testImg;
-      default:
-        return null
-    }//switch
-  }//imgSelector
-
   wiListFactory(wiArray){
     //console.log(wiArray)
     if(wiArray){
       return wiArray.map((wi)=>{
 
-        let img = this.imgSelector(wi.type);
+        let img = imgSelector(wi.type);
         // console.log(wi.url)
         return  <div
                   draggable
@@ -79,14 +42,13 @@ export default class BacklogContainer extends Component {
     }else{
       return <h4 align="center"> waiting for data....</h4>;
     }
-  }
+  }//wiListFactory
 
- 
   render() {
     return (
       <List style={{maxHeight: '100%', overflow: 'auto'}} component="nav">
       {this.wiListFactory(this.props.wiArray)}
      </List> 
     )
-  }
+  }//render
 }

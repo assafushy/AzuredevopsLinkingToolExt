@@ -1,5 +1,6 @@
 /*global VSS*/
-  
+import _ from 'lodash';
+
 export default class TFSRestActions {
 
 // PAT = encodePat("ouphoofiwhtbsl3houzxg6qocgos7bwsxpxcvaq4vtk6yxdcnksa")
@@ -22,26 +23,72 @@ export default class TFSRestActions {
 
   async getQueryResultsById(id){
     let queryResults = await this.wiClient.queryById(id);
-    // console.log(`queryResults : ${JSON.stringify(queryResults)}`)
+    //console.log(`queryResults : ${JSON.stringify(queryResults)}`)
     return queryResults;
   }//getQueryResultsById
 
-  async populateQueryResult(resultsArray){
-    let wiPopulatedArray = [];
-    wiPopulatedArray = await Promise.all(resultsArray.map(async (wi)=>{
-      let wiData = await this.wiClient.getWorkItem(wi.id);
-      // console.log(JSON.stringify(wiData));
-      return{
-        id: wiData.id,
-        title: wiData.fields["System.Title"],
-        type:wiData.fields["System.WorkItemType"],
-        url:wiData._links.html.href
-      } 
-    }));
 
+  async populateWorkItemDataById(id){
+    let wiData = await this.wiClient.getWorkItem(id);
+     return({
+         id: wiData.id,
+         title: wiData.fields["System.Title"],
+         type:wiData.fields["System.WorkItemType"],
+         url:wiData._links.html.href,
+         children:[]
+       });
+  }//populateWorkItemDataById
+
+  async populateQueryResult(resultsArray){
+   
+    let wiPopulatedArray = [];
+   
+    switch (resultsArray.queryResultType) {
+      case 1:
+        wiPopulatedArray = await Promise.all(resultsArray.workItems.map(async (wi)=>{
+          let wiData = await this.wiClient.getWorkItem(wi.id);
+          // console.log(JSON.stringify(wiData));
+          return{
+            id: wiData.id,
+            title: wiData.fields["System.Title"],
+            type:wiData.fields["System.WorkItemType"],
+            url:wiData._links.html.href
+          } 
+        }));
+        break;
+      case 2:
+        console.log(`Direct Links populate function`);
+        
+        await Promise.all(resultsArray.workItemRelations.map(async (wi)=>{
+          if (!wi.source){
+            let wiData = await this.populateWorkItemDataById(wi.target.id);
+            console.log(`source : ${wi.target.id}`);
+            wiPopulatedArray.push(wiData);
+          }
+        }));
+
+        await Promise.all(resultsArray.workItemRelations.map(async (wi)=>{
+          if (wi.source){
+            console.log(wi.source.id);
+            let i = _.findIndex(wiPopulatedArray, function(o) {return o.id == wi.source.id;});
+            if(i == -1){
+              console.log(i);
+            }else{
+              console.log(`index is: ${i}`);
+              wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id));
+            }
+          }
+        }));//map
+
+        console.log(JSON.stringify(wiPopulatedArray));
+        break;
+    default:
+      break;
+    }
+    
     // console.log(`populated wi array : ${JSON.stringify(wiPopulatedArray)}`);
     return wiPopulatedArray;
-  }
+  }//populateQueryResult
 
   async fetchSharedQueriesData(){
     return new Promise(async (resolve,reject)=>{
