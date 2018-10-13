@@ -8,7 +8,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import 'react-sortable-tree/style.css';
 import SortableTree from 'react-sortable-tree';
 import DirectLinksContainer from './DirectLinksContainer/DirectLinksContainer'
-
+import FabricFlatContainer from './BacklogContainer/FabricFlatContainer';
 let tfsData = new TFSRestActions();
     
 export default class App extends Component {
@@ -48,8 +48,7 @@ export default class App extends Component {
                 onDragExit={this.successfulLink.bind(this)}
                 wiArray ={this.state.leftContainerWiArray}/> 
       case 2:
-        return <DirectLinksContainer/>;
-        break;
+        return  <FabricFlatContainer/>;
       default:
         break;
     }
@@ -75,6 +74,7 @@ export default class App extends Component {
   render(){
     return(
       <div>
+        <FabricFlatContainer/>
         <ExtAppBar 
           queryList={this.state.queryList} 
           leftQueryId={this.state.leftQueryId}

@@ -6,6 +6,7 @@
     "@material-ui/core": "^1.4.2",
     "axios": "^0.18.0",
     "lodash": "^4.17.11",
+    "office-ui-fabric-react": "^6.84.0",
     "react": "^16.4.2",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.2",
