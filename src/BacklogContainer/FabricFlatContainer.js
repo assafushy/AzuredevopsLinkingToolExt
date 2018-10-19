@@ -12,7 +12,7 @@ const TitleWrapper = styled.div`
     display:flex
     flexDirection: row,
     justifyContent: space-between;
-`;
+  `;
 
 let categorizeLinks = (wiRelations)=>{
   let relCategories = {
@@ -141,8 +141,6 @@ class FabricFlatContainer extends Component {
           return true;
         },
         onDragEnter: (item, event) => {
-          console.log(`dragenterItem ${JSON.stringify(item)}`);
-          console.log(`dragEnterEvent ${JSON.stringify(event)}`)
           return 'dragEnter';
         }, // return string is the css classes that will be added to the entering element.
         onDragLeave: (item, event) => {
@@ -150,19 +148,16 @@ class FabricFlatContainer extends Component {
         },
         onDrop: (item, event) => {
           console.log(item);
-          console.log(event)
+          console.log(this.props);
+          this.props.handleDropEvent(item.id);
+          // console.log(event)
         },
         onDragStart: (item, itemIndex, selectedItems, event) => {
-          console.log(`item: ${JSON.stringify(item)}`);
-          console.log(`itemIndex: ${JSON.stringify(itemIndex)}`);
-          console.log(`selectedItems: ${JSON.stringify(selectedItems)}`);
-          console.log(`event: ${JSON.stringify(event)}`);
-          
-          // this.props.handleDragEvent()
-
+          // console.log(event);
+          this.props.handleDragEvent(item.id,event.ctrlKey,event.altKey,event.shiftKey);
         },
         onDragEnd: (item, event) => {
-          console.log("drag ended")
+          // console.log("drag ended")
         }
       };
   }//_getDragDropEvents

@@ -7,16 +7,15 @@ import BacklogContainer from './BacklogContainer/BacklogContainer';
 import TFSRestActions from './Actions/TFSRestActions';
 import Snackbar from '@material-ui/core/Snackbar';
 import 'react-sortable-tree/style.css';
-import SortableTree from 'react-sortable-tree';
-import DirectLinksContainer from './DirectLinksContainer/DirectLinksContainer'
 import FabricFlatContainer from './BacklogContainer/FabricFlatContainer';
 let tfsData = new TFSRestActions();
     
+
 export default class App extends Component {
   
   constructor(props) {
     super(props)
-   
+    
     tfsData.fetchSharedQueriesData().then((queryList)=>{this.setState({"queryList":queryList})});
 
     this.darggedItemId = null;
@@ -38,18 +37,18 @@ export default class App extends Component {
     }
   }//constructor
     
-
   leftContainerFactory(queryResultType){
     switch (queryResultType) {
       case 1:
-       return  <BacklogContainer  
-                handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
+       return  <FabricFlatContainer  
+                wiArray ={this.state.leftContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)} 
-                handleDropEvent={this.handleDropEvent.bind(this)}
-                onDragExit={this.successfulLink.bind(this)}
-                wiArray ={this.state.leftContainerWiArray}/> 
+                handleDropEvent={this.handleDropEvent.bind(this)}/> 
       case 2:
-        return  <FabricFlatContainer  wiArray = {this.state.leftContainerWiArray}/>;
+        return <FabricFlatContainer 
+                wiArray = {this.state.leftContainerWiArray}
+                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDropEvent={this.handleDropEvent.bind(this)}/>;
       default:
         break;
     }
@@ -58,16 +57,15 @@ export default class App extends Component {
   rightContainerFactory(queryResultType){
     switch (queryResultType) {
       case 1:
-       return <FabricFlatContainer wiArray = {this.state.rightContainerWiArray}
-                                   handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
-                                   handleDragEvent={this.handleDragEvent.bind(this)} 
-                                   handleDropEvent={this.handleDropEvent.bind(this)}
-                                   wiArray ={this.state.rightContainerWiArray}
-                                   onDragExit={this.successfulLink.bind(this)}
-       />;
+        return <FabricFlatContainer 
+                wiArray = {this.state.rightContainerWiArray}
+                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDropEvent={this.handleDropEvent.bind(this)}/>;
       case 2:
-          return <FabricFlatContainer wiArray = {this.state.rightContainerWiArray}/>;
-          break;
+        return <FabricFlatContainer 
+                wiArray = {this.state.rightContainerWiArray}
+                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDropEvent={this.handleDropEvent.bind(this)}/>;
       default:
         break;
     }
@@ -130,27 +128,6 @@ export default class App extends Component {
     this.successMessage = `sucessfully link ${wi1} to ${wi2}`;
     this.setState({openSuccessSnackBar:true});
   }//successfulLink
-  
-  handleKeyDown(key){
-    // console.log(key)
-    switch (key) {
-      case 'Shift':
-        // console.log(`pressed: ${key} alt`);
-        this.linkType = 'Elisra.CoveredBy-Forward';
-        this.setState({linkDescription:'Covers'});
-        break;
-      case 'Control':
-        // console.log(`pressed: ${key} Ctrl`);
-        this.linkType = 'Microsoft.VSTS.Common.TestedBy-Reverse';
-        this.setState({linkDescription:'Tests'});
-        break;
-      default:
-        // console.log(`defualt press`);
-        this.linkType = 'System.LinkTypes.Hierarchy-Forward';
-        this.setState({linkDescription:'Child of'});
-        break;
-    }
-  }//handleKeyDown
 
   handleDragEvent(id,ctrlKey,altKey,shiftKey){
     this.darggedItemId = id;
@@ -163,14 +140,14 @@ export default class App extends Component {
     }//if
     this.onCloseSuccessSnackBar();
     this.setState({ openDragSnackBar: true });
+    return true;
   }//handleDragEvent
 
-  handleDragOverEvent(id){
-    //console.log(`dargged over: ${id}`)
+  async handleDropEvent(id){
+    
+    console.log(`inside handle drop`);
     this.overItemId = id;
-  }//handleDragOverEvent
-
-  async handleDropEvent(){
+    
     await tfsData.addLinkToWi(this.overItemId,this.darggedItemId,this.linkType,this.successfulLink.bind(this));
     
     this.setState({linkDescription:'Child of'});
