@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
 import ExtAppBar from './ExtAppBar/ExtAppBar';
+import FabricCommandBar from './ExtAppBar/FabricCommandBar';
 import BacklogContainer from './BacklogContainer/BacklogContainer';
 import TFSRestActions from './Actions/TFSRestActions';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -29,8 +30,8 @@ export default class App extends Component {
       'rightQueryResultType':null,
       'leftQueryId':null,
       'rightQueryId':null,
-      'leftContainerWiArray': null,
-      'rightContainerWiArray': null,
+      'leftContainerWiArray': [],
+      'rightContainerWiArray': [],
       'linkDescription':'Related',
       'openDragSnackBar':false,
       'openSuccessSnackBar':false
@@ -48,7 +49,7 @@ export default class App extends Component {
                 onDragExit={this.successfulLink.bind(this)}
                 wiArray ={this.state.leftContainerWiArray}/> 
       case 2:
-        return  <FabricFlatContainer/>;
+        return  <FabricFlatContainer  wiArray = {this.state.leftContainerWiArray}/>;
       default:
         break;
     }
@@ -57,14 +58,15 @@ export default class App extends Component {
   rightContainerFactory(queryResultType){
     switch (queryResultType) {
       case 1:
-       return <BacklogContainer   handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
-                                  handleDragEvent={this.handleDragEvent.bind(this)} 
-                                  handleDropEvent={this.handleDropEvent.bind(this)}
-                                  wiArray ={this.state.rightContainerWiArray}
-                                  onDragExit={this.successfulLink.bind(this)}
-                                  />
+       return <FabricFlatContainer wiArray = {this.state.rightContainerWiArray}
+                                   handleDragOverEvent= {this.handleDragOverEvent.bind(this)} 
+                                   handleDragEvent={this.handleDragEvent.bind(this)} 
+                                   handleDropEvent={this.handleDropEvent.bind(this)}
+                                   wiArray ={this.state.rightContainerWiArray}
+                                   onDragExit={this.successfulLink.bind(this)}
+       />;
       case 2:
-          return <DirectLinksContainer/>;
+          return <FabricFlatContainer wiArray = {this.state.rightContainerWiArray}/>;
           break;
       default:
         break;
@@ -74,7 +76,7 @@ export default class App extends Component {
   render(){
     return(
       <div>
-        <FabricFlatContainer/>
+        <FabricCommandBar/>
         <ExtAppBar 
           queryList={this.state.queryList} 
           leftQueryId={this.state.leftQueryId}

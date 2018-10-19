@@ -8,7 +8,7 @@ export default class TFSRestActions {
     let wiClient;
     let workItemContracts;
     this.init().then(()=>{console.log(`initlized`)});
-  }
+  }//constructor
 
   init(){
     return new Promise((resolve,reject)=>{
@@ -16,6 +16,7 @@ export default class TFSRestActions {
       async (workItemClient, workItemContracts)=> {
         this.wiClient = await workItemClient.getClient();
         this.workItemContracts = workItemContracts;
+        console.log(this.workItemContracts);
         resolve();
       })//require
     })  
@@ -23,19 +24,20 @@ export default class TFSRestActions {
 
   async getQueryResultsById(id){
     let queryResults = await this.wiClient.queryById(id);
-    //console.log(`queryResults : ${JSON.stringify(queryResults)}`)
+    // console.log(`queryResults : ${JSON.stringify(queryResults)}`)
     return queryResults;
   }//getQueryResultsById
 
-
   async populateWorkItemDataById(id){
-    let wiData = await this.wiClient.getWorkItem(id);
-     return({
+    
+    let wiData = await this.wiClient.getWorkItem(id,null,null,this.workItemContracts.WorkItemExpand[1]);
+   
+    return({
          id: wiData.id,
          title: wiData.fields["System.Title"],
          type:wiData.fields["System.WorkItemType"],
          url:wiData._links.html.href,
-         children:[]
+         relations:wiData.relations
        });
   }//populateWorkItemDataById
 
@@ -46,14 +48,9 @@ export default class TFSRestActions {
     switch (resultsArray.queryResultType) {
       case 1:
         wiPopulatedArray = await Promise.all(resultsArray.workItems.map(async (wi)=>{
-          let wiData = await this.wiClient.getWorkItem(wi.id);
+          let wiData = await this.populateWorkItemDataById(wi.id);
           // console.log(JSON.stringify(wiData));
-          return{
-            id: wiData.id,
-            title: wiData.fields["System.Title"],
-            type:wiData.fields["System.WorkItemType"],
-            url:wiData._links.html.href
-          } 
+          return wiData;
         }));
         break;
       case 2:
@@ -62,25 +59,25 @@ export default class TFSRestActions {
         await Promise.all(resultsArray.workItemRelations.map(async (wi)=>{
           if (!wi.source){
             let wiData = await this.populateWorkItemDataById(wi.target.id);
-            console.log(`source : ${wi.target.id}`);
+            // console.log(`source : ${wi.target.id}`);
             wiPopulatedArray.push(wiData);
           }
         }));
 
-        await Promise.all(resultsArray.workItemRelations.map(async (wi)=>{
-          if (wi.source){
-            console.log(wi.source.id);
-            let i = _.findIndex(wiPopulatedArray, function(o) {return o.id == wi.source.id;});
-            if(i == -1){
-              console.log(i);
-            }else{
-              console.log(`index is: ${i}`);
-              wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id));
-            }
-          }
-        }));//map
+        // await Promise.all(resultsArray.workItemRelations.map(async (wi)=>{
+        //   if (wi.source){
+        //     console.log(wi.source.id);
+        //     let i = _.findIndex(wiPopulatedArray, function(o) {return o.id == wi.source.id;});
+        //     if(i == -1){
+        //       console.log(i);
+        //     }else{
+        //       console.log(`index is: ${i}`);
+        //       wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id));
+        //     }
+        //   }
+        // }));//map
 
-        console.log(JSON.stringify(wiPopulatedArray));
+        // console.log(JSON.stringify(wiPopulatedArray));
         break;
     default:
       break;
@@ -139,9 +136,6 @@ export default class TFSRestActions {
 
   async addLinkToWi(wi1,wi2,linkType,success){
     try{
-
-      
-   
       // tested by - ctrl
       // need to display links count by type
       
