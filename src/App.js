@@ -24,7 +24,7 @@ export default class App extends Component {
     this.successMessage = '';
 
     this.state = {
-      'queryList' : null,
+      'queryList' : [],
       'leftQueryResultType':null,
       'rightQueryResultType':null,
       'leftQueryId':null,
@@ -42,12 +42,14 @@ export default class App extends Component {
       case 1:
        return  <FabricFlatContainer  
                 wiArray ={this.state.leftContainerWiArray}
-                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDragEvent={this.handleDragEvent.bind(this)}
+                handleDragEnd={this.handleDragEnd.bind(this)} 
                 handleDropEvent={this.handleDropEvent.bind(this)}/> 
       case 2:
         return <FabricFlatContainer 
                 wiArray = {this.state.leftContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDragEnd={this.handleDragEnd.bind(this)} 
                 handleDropEvent={this.handleDropEvent.bind(this)}/>;
       default:
         break;
@@ -59,12 +61,14 @@ export default class App extends Component {
       case 1:
         return <FabricFlatContainer 
                 wiArray = {this.state.rightContainerWiArray}
-                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDragEvent={this.handleDragEvent.bind(this)}
+                handleDragEnd={this.handleDragEnd.bind(this)}  
                 handleDropEvent={this.handleDropEvent.bind(this)}/>;
       case 2:
         return <FabricFlatContainer 
                 wiArray = {this.state.rightContainerWiArray}
-                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDragEvent={this.handleDragEvent.bind(this)}
+                handleDragEnd={this.handleDragEnd.bind(this)}  
                 handleDropEvent={this.handleDropEvent.bind(this)}/>;
       default:
         break;
@@ -74,15 +78,13 @@ export default class App extends Component {
   render(){
     return(
       <div>
-        <FabricCommandBar/>
-        <ExtAppBar 
-          queryList={this.state.queryList} 
-          leftQueryId={this.state.leftQueryId}
-          rightQueryId={this.state.rightQueryId}
-          linkType={this.state.linkDescription} 
-          onQuerySelectHandler={this.onQuerySelectHandler.bind(this)}
-          />
-
+        <FabricCommandBar
+           queryList={this.state.queryList} 
+           leftQueryId={this.state.leftQueryId}
+           rightQueryId={this.state.rightQueryId}
+           linkType={this.state.linkDescription} 
+           onQuerySelectHandler={this.onQuerySelectHandler.bind(this)}
+        />
         <Grid  container spacing={0}>
           <Grid item xs={6}>
             {this.leftContainerFactory(this.state.leftQueryResultType)}
@@ -129,7 +131,29 @@ export default class App extends Component {
     this.setState({openSuccessSnackBar:true});
   }//successfulLink
 
+  handleKeyDown(key){
+    // console.log(key)
+    switch (key) {
+      case 'Shift':
+        // console.log(`pressed: ${key} alt`);
+        this.linkType = 'Elisra.CoveredBy-Forward';
+        this.setState({linkDescription:'Covers'});
+        break;
+      case 'Control':
+        // console.log(`pressed: ${key} Ctrl`);
+        this.linkType = 'Microsoft.VSTS.Common.TestedBy-Reverse';
+        this.setState({linkDescription:'Tests'});
+        break;
+      default:
+        // console.log(`defualt press`);
+        this.linkType = 'System.LinkTypes.Hierarchy-Forward';
+        this.setState({linkDescription:'Child of'});
+        break;
+    }
+  }//handleKeyDown
+
   handleDragEvent(id,ctrlKey,altKey,shiftKey){
+   
     this.darggedItemId = id;
     if(ctrlKey){this.handleKeyDown('Control');}else{
       if(altKey){this.handleKeyDown('Alt');}else{
@@ -139,9 +163,17 @@ export default class App extends Component {
       }//if
     }//if
     this.onCloseSuccessSnackBar();
-    this.setState({ openDragSnackBar: true });
-    return true;
+    this.setState({openDragSnackBar:true });
+    // return true;
   }//handleDragEvent
+
+  async handleDragEnd(){
+    this.setState({linkDescription:'Child of'});
+    this.setState({openDragSnackBar:false});
+    this.darggedItemId = null;
+    this.overItemId = null;
+  }//handleDragEnd
+
 
   async handleDropEvent(id){
     

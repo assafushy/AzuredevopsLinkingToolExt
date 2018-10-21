@@ -1,71 +1,58 @@
-import * as React from 'react';
-import { CommandBarButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
+import React,{Component} from 'react';
 
-export default class FabricCommandBar extends React.Component{
-  render() {
+import { CommandBar} from 'office-ui-fabric-react/lib/CommandBar';
+import { Layer } from 'office-ui-fabric-react/lib/Layer';
+
+
+class FabricCommandBar extends Component {
+  
+  generateQueryItems(queryArray,containerSide){
     
-    const { disabled, checked } = this.props;
+    let queryItems=[];
+    
+      queryArray.forEach((query) => {
+        
+        let item =  {
+          key: query.id,
+          name: query.queryName,
+          onClick:()=>{ this.props.onQuerySelectHandler(query.id,containerSide);}
+        }
+        queryItems.push(item);
+      });//forEach
+      
+      return [
+        {
+          key: 'newItem',
+          name: 'Please Select A Query',
+          cacheKey: 'myCacheKey', // changing this key will invalidate this items cache
+          iconProps: {
+            iconName: 'Add'
+          },
+          ariaLabel: 'New. Use left and right arrow keys to navigate',
+          subMenuProps: {
+            items: queryItems
+          }
+        }
+      ]; 
+  }//generateQueryItems
 
-    const alertClicked = () => {
-      alert('Clicked');
-    };
-
+  render() {
     return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'stretch', height: '40px' }}>
-          <CommandBarButton
-            data-automation-id="test"
-            disabled={disabled}
-            checked={checked}
-            iconProps={{ iconName: 'Add' }}
-            text="Create account"
-            menuProps={{
-              items: [
-                {
-                  key: 'emailMessage',
-                  text: 'Email message',
-                  iconProps: { iconName: 'Mail' }
-                },
-                {
-                  key: 'calendarEvent',
-                  text: 'Calendar event',
-                  iconProps: { iconName: 'Calendar' }
-                }
-              ]
-            }}
-          />
-          <CommandBarButton
-            data-automation-id="test"
-            disabled={disabled}
-            checked={checked}
-            iconProps={{ iconName: 'Add' }}
-            text="Create account"
-            split={true}
-            onClick={alertClicked}
-            menuProps={{
-              items: [
-                {
-                  key: 'emailMessage',
-                  name: 'Email message',
-                  icon: 'Mail'
-                },
-                {
-                  key: 'calendarEvent',
-                  name: 'Calendar event',
-                  icon: 'Calendar'
-                }
-              ]
-            }}
-          />
-          <CommandBarButton
-            data-automation-id="test2"
-            disabled={disabled}
-            checked={checked}
-            iconProps={{ iconName: 'Mail' }}
-            text="Send Mail"
-          />
-        </div>
+        <Layer width="auto">
+          <p align = "center"><strong>Work Items DnD Linking Tool - (Default link - Child of | Hold down Ctrl - Tests | Hold down Shift - Covers)</strong> </p>
+        </Layer>
+         <CommandBar
+          items={this.generateQueryItems(this.props.queryList,"left")}       
+          farItems={this.generateQueryItems(this.props.queryList,"right")}
+          ariaLabel={'Use left and right arrow keys to navigate between commands'}
+        />
       </div>
     );
   }
-}
+
+}//class
+
+
+
+export default FabricCommandBar;

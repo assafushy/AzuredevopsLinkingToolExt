@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import {DetailsList,DetailsListLayoutMode,Selection} from 'office-ui-fabric-react/lib/DetailsList';
-import { MarqueeSelection } from 'office-ui-fabric-react/lib/MarqueeSelection';  
+import {DetailsList,DetailsListLayoutMode,Selection} from 'office-ui-fabric-react/lib/DetailsList'; 
 import styled from 'styled-components';
 import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
 import {imgSelector} from '../Actions/ImgGenerator';
@@ -153,11 +152,10 @@ class FabricFlatContainer extends Component {
           // console.log(event)
         },
         onDragStart: (item, itemIndex, selectedItems, event) => {
-          // console.log(event);
           this.props.handleDragEvent(item.id,event.ctrlKey,event.altKey,event.shiftKey);
         },
         onDragEnd: (item, event) => {
-          // console.log("drag ended")
+         this.props.handleDragEnd();
         }
       };
   }//_getDragDropEvents
@@ -172,6 +170,7 @@ class FabricFlatContainer extends Component {
                   selection={this._selection}
                   dragDropEvents={this._getDragDropEvents()}
                   styles={{root:{maxHeight: '100%',  overflow: 'auto'}}}
+                  
                   // setKey="set"
                   // selectionPreservedOnEmptyClick={true}
                   // componentRef={this._detailsList}
