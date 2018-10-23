@@ -119,7 +119,7 @@ let columnList = [
   ];
 
 
-class FabricFlatContainer extends Component {  
+class FabricDirectLinksContainer extends Component {  
    
   constructor(){
     super();
@@ -160,17 +160,53 @@ class FabricFlatContainer extends Component {
       };
   }//_getDragDropEvents
 
+  groupFactory(wiList){
+    let groupArray = [];
+    let startIndex = 0;
+
+    wiList.forEach(wi => {
+        let groupDetails = {
+          count:wi.children.length,
+          key:wi.id,
+          name:wi.title,
+          startIndex:startIndex
+        };
+
+        groupArray.push(groupDetails);
+        startIndex= startIndex+1+wi.children.length;
+         
+    });//foreach
+
+    return groupArray;
+  }//groupfactory
+
+  wiFactory(wiList){
+    let wiForRender = [];
+
+    wiList.forEach(wi=>{
+      wiForRender.push(wi);
+      if (wi.children) {
+        wi.children.forEach(wi=>{
+          wiForRender.push(wi);
+        })
+      }//if
+    })//foreach
+
+    return wiForRender;
+  }//wiFactory
+
+
   render() {
       return (
           <div>
               <DetailsList
-                  items={this.props.wiArray}
+                  items={this.wiFactory(this.props.wiArray)}
                   columns={columnList}
                   layoutMode={DetailsListLayoutMode.fixedColumns}
                   selection={this._selection}
                   dragDropEvents={this._getDragDropEvents()}
                   styles={{root:{maxHeight: '100%',  overflow: 'auto'}}}
-                  
+                  groups={this.groupFactory(this.props.wiArray)}
                   // setKey="set"
                   // selectionPreservedOnEmptyClick={true}
                   // componentRef={this._detailsList}
@@ -184,4 +220,4 @@ class FabricFlatContainer extends Component {
 }
 
 
-export default FabricFlatContainer;
+export default FabricDirectLinksContainer;

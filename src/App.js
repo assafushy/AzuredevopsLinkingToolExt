@@ -1,9 +1,8 @@
 /*global VSS*/
 import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
-import ExtAppBar from './ExtAppBar/ExtAppBar';
 import FabricCommandBar from './ExtAppBar/FabricCommandBar';
-import BacklogContainer from './BacklogContainer/BacklogContainer';
+import FabricDirectLinksContainer from './DirectLinksContainer/FabricDirectLinksContainer'
 import TFSRestActions from './Actions/TFSRestActions';
 import Snackbar from '@material-ui/core/Snackbar';
 import 'react-sortable-tree/style.css';
@@ -46,7 +45,7 @@ export default class App extends Component {
                 handleDragEnd={this.handleDragEnd.bind(this)} 
                 handleDropEvent={this.handleDropEvent.bind(this)}/> 
       case 2:
-        return <FabricFlatContainer 
+        return <FabricDirectLinksContainer 
                 wiArray = {this.state.leftContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)} 
                 handleDragEnd={this.handleDragEnd.bind(this)} 
@@ -65,7 +64,7 @@ export default class App extends Component {
                 handleDragEnd={this.handleDragEnd.bind(this)}  
                 handleDropEvent={this.handleDropEvent.bind(this)}/>;
       case 2:
-        return <FabricFlatContainer 
+        return <FabricDirectLinksContainer 
                 wiArray = {this.state.rightContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)}
                 handleDragEnd={this.handleDragEnd.bind(this)}  
@@ -173,7 +172,6 @@ export default class App extends Component {
     this.darggedItemId = null;
     this.overItemId = null;
   }//handleDragEnd
-
 
   async handleDropEvent(id){
     

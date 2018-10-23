@@ -37,7 +37,8 @@ export default class TFSRestActions {
          title: wiData.fields["System.Title"],
          type:wiData.fields["System.WorkItemType"],
          url:wiData._links.html.href,
-         relations:wiData.relations
+         relations:wiData.relations,
+         children:[]
        });
   }//populateWorkItemDataById
 
@@ -64,20 +65,20 @@ export default class TFSRestActions {
           }
         }));
 
-        // await Promise.all(resultsArray.workItemRelations.map(async (wi)=>{
-        //   if (wi.source){
-        //     console.log(wi.source.id);
-        //     let i = _.findIndex(wiPopulatedArray, function(o) {return o.id == wi.source.id;});
-        //     if(i == -1){
-        //       console.log(i);
-        //     }else{
-        //       console.log(`index is: ${i}`);
-        //       wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id));
-        //     }
-        //   }
-        // }));//map
+        await Promise.all(resultsArray.workItemRelations.map(async (wi)=>{
+          if (wi.source){
+            // console.log(wi.source.id);
+            let i = _.findIndex(wiPopulatedArray, function(o) {return o.id == wi.source.id;});
+            if(i == -1){
+              // console.log(i);
+            }else{
+              // console.log(`index is: ${i}`);
+              wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id));
+            }
+          }
+        }));//map
 
-        // console.log(JSON.stringify(wiPopulatedArray));
+        console.log(JSON.stringify(wiPopulatedArray));
         break;
     default:
       break;
