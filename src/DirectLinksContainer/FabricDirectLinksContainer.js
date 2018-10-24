@@ -73,6 +73,13 @@ class FabricDirectLinksContainer extends Component {
       maxWidth: 20,
       isResizable:true,
       ariaLabel: 'WorkItem ID',
+      onRender: (item) => {
+         return( 
+              <div align='center' padding='5'>
+                <p>{item.id}</p>
+              </div>
+         )
+      }
     },
     {
       key: 'title',
@@ -84,22 +91,28 @@ class FabricDirectLinksContainer extends Component {
       ariaLabel: 'WorkItem title',
       onRender: (item) => {
         let img = imgSelector(item.type);
-        let space = `-------------`;
+        let space = `-----`;
         let expandIcon = '';
         
         (item.isExpanded)?expandIcon = 'chevronDown':expandIcon = 'chevronRight';
 
         return <TitleWrapper>
+                    
                     {(item.depth)?<div>{space}</div>:null}
+                    
                     {(item.isParent)?
-                    <div onClick={()=>{this.props.handleToggleVisible(item.id)}} width="20" height="20">
-                      <Icon iconName={expandIcon}/>
+                    <div  onClick={()=>{this.props.handleToggleVisible(item.id)}} width="10" height="10">
+                      <Icon iconName={expandIcon} />
                     </div>
                     :
                     null
                     }
-                    <img src={img} width="20" height="20"/>
-                    <p >{item.title}</p>
+
+                    {/* <Icon vertical-align='middle' iconName='TaskSolid' /> */}
+                   
+                      <img src={img} width="20" height="20"/>
+                      <p>{item.title}</p>
+                   
                 </TitleWrapper>
       }//onRender
     },
@@ -262,7 +275,7 @@ class FabricDirectLinksContainer extends Component {
   render() {
       return (
           <div style={{
-            height: '80vh',
+            height: '100%',
             width:'100%',
             overflow:'true',
             position: 'relative'
@@ -274,7 +287,7 @@ class FabricDirectLinksContainer extends Component {
                   layoutMode={DetailsListLayoutMode.fixedColumns}
                   selection={this._selection}
                   dragDropEvents={this._getDragDropEvents()}
-                  styles={{root:{height:'100%',overflow: 'auto'}}}
+                  styles={{root:{overflow: 'auto'}}}
                   onRenderDetailsHeader={this.onRenderDetailsHeader}
                   // setKey="set"
                   // selectionPreservedOnEmptyClick={true}
