@@ -1,5 +1,6 @@
 /*global VSS*/
 import React, { Component } from 'react';
+import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
 import FabricCommandBar from './ExtAppBar/FabricCommandBar';
 import FabricDirectLinksContainer from './DirectLinksContainer/FabricDirectLinksContainer'
@@ -49,7 +50,9 @@ export default class App extends Component {
                 wiArray = {this.state.leftContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)} 
                 handleDragEnd={this.handleDragEnd.bind(this)} 
-                handleDropEvent={this.handleDropEvent.bind(this)}/>;
+                handleDropEvent={this.handleDropEvent.bind(this)}
+                handleToggleVisible={this.toggleVisibility.bind(this)}/>;
+
       default:
         break;
     }
@@ -207,4 +210,27 @@ export default class App extends Component {
     }//if
 
   }//onQuerySelectHandler
+
+  toggleVisibility(wiId){
+    let visibleUpdateWiArray = this.state.leftContainerWiArray;
+    let indexToToggle = _.findIndex(visibleUpdateWiArray,(o)=>{return o.id == wiId});
+    
+    if (indexToToggle != -1) {
+      if(visibleUpdateWiArray[indexToToggle].isExpanded){
+        visibleUpdateWiArray[indexToToggle].isExpanded=false
+      }else{
+        visibleUpdateWiArray[indexToToggle].isExpanded=true;
+      }//if
+
+      visibleUpdateWiArray[indexToToggle].children.forEach(wi => {
+        if(wi.visible){
+          wi.visible=false;
+        }else{
+          wi.visible=true;
+        }//if
+      });//foreach
+    }//if
+    
+    this.setState({leftContainerWiArray:visibleUpdateWiArray});
+  }
 }

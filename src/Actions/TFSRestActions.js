@@ -28,7 +28,7 @@ export default class TFSRestActions {
     return queryResults;
   }//getQueryResultsById
 
-  async populateWorkItemDataById(id){
+  async populateWorkItemDataById(id,isParent=true){
     
     let wiData = await this.wiClient.getWorkItem(id,null,null,this.workItemContracts.WorkItemExpand[1]);
    
@@ -38,7 +38,11 @@ export default class TFSRestActions {
          type:wiData.fields["System.WorkItemType"],
          url:wiData._links.html.href,
          relations:wiData.relations,
-         children:[]
+         
+         isParent:isParent,
+         children:[],
+         visible:true,
+         isExpanded:true
        });
   }//populateWorkItemDataById
 
@@ -73,7 +77,7 @@ export default class TFSRestActions {
               // console.log(i);
             }else{
               // console.log(`index is: ${i}`);
-              wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id));
+              wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id,false));
             }
           }
         }));//map
