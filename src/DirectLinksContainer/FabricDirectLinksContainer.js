@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {DetailsList,DetailsListLayoutMode,Selection} from 'office-ui-fabric-react/lib/DetailsList'; 
+import {DetailsList,DetailsListLayoutMode,Selection,CheckboxVisibility,IColumnReorderOptions} from 'office-ui-fabric-react/lib/DetailsList'; 
 import styled from 'styled-components';
 import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
 import {Icon} from 'office-ui-fabric-react/lib/Icon';
@@ -7,15 +7,16 @@ import {imgSelector} from '../Actions/ImgGenerator';
 import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
 import { ScrollablePane, IScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
 import _ from 'lodash';
-
+import Grid from '@material-ui/core/Grid';
 initializeIcons();
 
 const TitleWrapper = styled.div`
+  margin:0,
+  padding:0,
   display:flex
   flexDirection: row,
   justifyContent: space-between;
 `;
-
 
 let categorizeLinks = (wiRelations)=>{
   let relCategories = {
@@ -58,12 +59,14 @@ class FabricDirectLinksContainer extends Component {
    
   constructor(){
     super();
-    let  _selection;  
+    let  _selection;
+    this.state={
+      columns:this.columnList
+    }  
   }
 
   _selection = new Selection();
   
-
   columnList = [
     {
       key: 'id',
@@ -85,8 +88,8 @@ class FabricDirectLinksContainer extends Component {
       key: 'title',
       name: 'Title',
       fieldName: 'title',
-      minWidth: 100,
-      maxWidth: 200,
+      minWidth: 200,
+      maxWidth: 400,
       isResizable: true,
       ariaLabel: 'WorkItem title',
       onRender: (item) => {
@@ -98,21 +101,32 @@ class FabricDirectLinksContainer extends Component {
 
         return <TitleWrapper>
                     
-                    {(item.depth)?<div>{space}</div>:null}
-                    
+                  <Grid  container spacing={0} style={{'padding':'0'}}>     
+                    {(item.depth)?<Grid item xs={2}></Grid>:null}
+                     
                     {(item.isParent)?
-                    <div  onClick={()=>{this.props.handleToggleVisible(item.id)}} width="10" height="10">
-                      <Icon iconName={expandIcon} />
-                    </div>
+                     <Grid item xs={1} style={{'padding-top':'15','paddingRight':'0'}}>
+                        <div  onClick={()=>{this.props.handleToggleVisible(item.id)}} width="10" height="10">
+                          <Icon iconName={expandIcon} />
+                        </div>
+                      </Grid>
                     :
                     null
                     }
 
                     {/* <Icon vertical-align='middle' iconName='TaskSolid' /> */}
-                   
-                      <img src={img} width="20" height="20"/>
-                      <p>{item.title}</p>
-                   
+                    <Grid item xs={7}>
+                      <Grid  container spacing={2}>  
+                        <Grid item xs={1}  style={{'padding-top':'10'}}>
+                          <img src={img} width="20" height="20"/>
+                        </Grid>
+                        <Grid item xs={11}>
+                          <p>{item.title}</p>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+
+                  </Grid>
                 </TitleWrapper>
       }//onRender
     },
@@ -145,7 +159,7 @@ class FabricDirectLinksContainer extends Component {
         
         let links = categorizeLinks(item.relations);
          return( 
-              <div align='center' padding='5'>
+              <div align='center' padding='0'>
                 <p>{links.child}</p>
               </div>
          )
@@ -253,6 +267,17 @@ class FabricDirectLinksContainer extends Component {
       };
   }//_getDragDropEvents
 
+
+  _handleColumnReorder = (draggedIndex, targetIndex) => {
+    const draggedItems = this.state.columns[draggedIndex];
+    const newColumns = [...this.state.columns];
+
+    // insert before the dropped item
+    newColumns.splice(draggedIndex, 1);
+    newColumns.splice(targetIndex, 0, draggedItems);
+    this.setState({ columns: newColumns });
+  };
+
   wiFactory(wiList){
     let wiForRender = [];
 
@@ -283,18 +308,19 @@ class FabricDirectLinksContainer extends Component {
             <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
               <DetailsList
                   items={this.wiFactory(this.props.wiArray)}
-                  columns={this.columnList}
+                  columns={this.state.columns}
                   layoutMode={DetailsListLayoutMode.fixedColumns}
                   selection={this._selection}
                   dragDropEvents={this._getDragDropEvents()}
                   styles={{root:{overflow: 'auto'}}}
                   onRenderDetailsHeader={this.onRenderDetailsHeader}
-                  // setKey="set"
-                  // selectionPreservedOnEmptyClick={true}
-                  // componentRef={this._detailsList}
-                  // ariaLabelForSelectionColumn="Toggle selection"
-                  // ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-                  // onItemInvoked={()=>{console.log("selected")}}
+                  selectionMode='none'
+                  checkboxVisibility={CheckboxVisibility.hidden}
+                  columnReorderOptions={{
+                    frozenColumnCountFromStart: 0,
+                    frozenColumnCountFromEnd: 0,
+                    handleColumnReorder: this._handleColumnReorder
+                  }}
                   />     
             </ScrollablePane>
           </div>
