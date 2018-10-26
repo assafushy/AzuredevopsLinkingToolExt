@@ -106,7 +106,7 @@ class FabricDirectLinksContainer extends Component {
                      
                     {(item.isParent)?
                      <Grid item xs={1} style={{'padding-top':'15','paddingRight':'0'}}>
-                        <div  onClick={()=>{this.props.handleToggleVisible(item.id)}} width="10" height="10">
+                        <div  onClick={()=>{this.props.handleToggleVisible(item.id,this.props.containerSide)}} width="10" height="10">
                           <Icon iconName={expandIcon} />
                         </div>
                       </Grid>
@@ -267,7 +267,6 @@ class FabricDirectLinksContainer extends Component {
       };
   }//_getDragDropEvents
 
-
   _handleColumnReorder = (draggedIndex, targetIndex) => {
     const draggedItems = this.state.columns[draggedIndex];
     const newColumns = [...this.state.columns];
@@ -276,7 +275,7 @@ class FabricDirectLinksContainer extends Component {
     newColumns.splice(draggedIndex, 1);
     newColumns.splice(targetIndex, 0, draggedItems);
     this.setState({ columns: newColumns });
-  };
+  };//_handleColumnReorder
 
   wiFactory(wiList){
     let wiForRender = [];

@@ -32,6 +32,16 @@ class FabricCommandBar extends Component {
           subMenuProps: {
             items: queryItems
           }
+        },{
+          key: 'Refresh',
+          name: 'Refresh',
+          iconProps: {
+            iconName: 'Refresh'
+          },
+          onClick: () => {
+            if(containerSide == 'left'){this.props.onQuerySelectHandler(this.props.leftQueryId,containerSide);};
+            if(containerSide == 'right'){this.props.onQuerySelectHandler(this.props.rightQueryId,containerSide);}
+            }
         }
       ]; 
   }//generateQueryItems

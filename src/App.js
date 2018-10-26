@@ -8,6 +8,7 @@ import TFSRestActions from './Actions/TFSRestActions';
 import Snackbar from '@material-ui/core/Snackbar';
 import 'react-sortable-tree/style.css';
 import FabricFlatContainer from './BacklogContainer/FabricFlatContainer';
+
 let tfsData = new TFSRestActions();
     
 
@@ -41,12 +42,14 @@ export default class App extends Component {
     switch (queryResultType) {
       case 1:
        return  <FabricFlatContainer  
+                containerSide='left'
                 wiArray ={this.state.leftContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)}
                 handleDragEnd={this.handleDragEnd.bind(this)} 
                 handleDropEvent={this.handleDropEvent.bind(this)}/> 
       case 2:
         return <FabricDirectLinksContainer 
+                containerSide='left'
                 wiArray = {this.state.leftContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)} 
                 handleDragEnd={this.handleDragEnd.bind(this)} 
@@ -62,16 +65,19 @@ export default class App extends Component {
     switch (queryResultType) {
       case 1:
         return <FabricFlatContainer 
+                containerSide='right'
                 wiArray = {this.state.rightContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)}
                 handleDragEnd={this.handleDragEnd.bind(this)}  
                 handleDropEvent={this.handleDropEvent.bind(this)}/>;
       case 2:
         return <FabricDirectLinksContainer 
+                containerSide='right'
                 wiArray = {this.state.rightContainerWiArray}
                 handleDragEvent={this.handleDragEvent.bind(this)}
                 handleDragEnd={this.handleDragEnd.bind(this)}  
-                handleDropEvent={this.handleDropEvent.bind(this)}/>;
+                handleDropEvent={this.handleDropEvent.bind(this)}
+                handleToggleVisible={this.toggleVisibility.bind(this)}/>;
       default:
         break;
     }
@@ -100,7 +106,7 @@ export default class App extends Component {
           anchorOrigin={{vertical: 'top',horizontal: 'left'}}
           open={this.state.openDragSnackBar}
           ContentProps={{'aria-describedby': 'message-id'}}
-          message={<span id="message-id">currently linking workItem #{this.darggedItemId} as {this.state.linkDescription}</span>}
+          message={<span id="message-id"> linking #{this.darggedItemId} as {this.state.linkDescription}</span>}
         />
         <Snackbar
           anchorOrigin={{vertical: 'top',horizontal: 'left'}}
@@ -125,11 +131,14 @@ export default class App extends Component {
       this.setState({openDragSnackBar:false});
       return false;
     }//if
-    if(wi1 === null && wi2 === null){
+    if(wi1.id === null && wi2.id === null){
       this.setState({openDragSnackBar:false});
       return false
     }
-    this.successMessage = `sucessfully link ${wi1} to ${wi2}`;
+
+    this.updateLinksData(wi1,wi2,'right');
+    this.updateLinksData(wi1,wi2,'left');
+    this.successMessage = `sucessfully link ${wi1.id} to ${wi2.id}`;
     this.setState({openSuccessSnackBar:true});
   }//successfulLink
 
@@ -211,8 +220,10 @@ export default class App extends Component {
 
   }//onQuerySelectHandler
 
-  toggleVisibility(wiId){
-    let visibleUpdateWiArray = this.state.leftContainerWiArray;
+  toggleVisibility(wiId,containerSide){
+    let visibleUpdateWiArray;
+    if(containerSide === 'left'){visibleUpdateWiArray = this.state.leftContainerWiArray;}
+    if(containerSide === 'right'){visibleUpdateWiArray = this.state.rightContainerWiArray;}
     let indexToToggle = _.findIndex(visibleUpdateWiArray,(o)=>{return o.id == wiId});
     
     if (indexToToggle != -1) {
@@ -232,5 +243,25 @@ export default class App extends Component {
     }//if
     
     this.setState({leftContainerWiArray:visibleUpdateWiArray});
-  }
+  }//toggleVisibility
+
+  updateLinksData(wiData1,wiData2,containerSide){
+    
+    let wiArray;
+
+    if(containerSide=='right'){wiArray = this.state.leftContainerWiArray;}
+    if(containerSide=='left'){wiArray = this.state.rightContainerWiArray;}
+
+    wiArray.forEach((wi,i)=>{
+      if(wi.id == wiData1.id){
+        wiArray[i].relations = wiData1.relations;
+      }
+      if(wi.id == wiData2.id){
+        wiArray[i].relations = wiData2.relations;
+      }
+    });
+    
+    if(containerSide=='right'){this.setState({rightContainerWiArray:wiArray})}
+    if(containerSide=='left'){this.setState({leftContainerWiArray:wiArray})}
+  }//updateLinksData
 }
