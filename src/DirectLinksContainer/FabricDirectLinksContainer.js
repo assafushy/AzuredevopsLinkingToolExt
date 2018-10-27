@@ -89,7 +89,7 @@ class FabricDirectLinksContainer extends Component {
       name: 'Title',
       fieldName: 'title',
       minWidth: 200,
-      maxWidth: 400,
+      maxWidth: 500,
       isResizable: true,
       ariaLabel: 'WorkItem title',
       onRender: (item) => {

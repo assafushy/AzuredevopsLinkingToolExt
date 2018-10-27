@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
-import {DetailsList,DetailsListLayoutMode,Selection} from 'office-ui-fabric-react/lib/DetailsList'; 
-import styled from 'styled-components';
+import {DetailsList,DetailsListLayoutMode,Selection,CheckboxVisibility,IColumnReorderOptions} from 'office-ui-fabric-react/lib/DetailsList'; 
 import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
 import {imgSelector} from '../Actions/ImgGenerator';
-
+import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
+import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
+import Grid from '@material-ui/core/Grid';
+import _ from 'lodash';
 
 initializeIcons();
 
-const TitleWrapper = styled.div`
-    display:flex
-    flexDirection: row,
-    justifyContent: space-between;
-  `;
 
 let categorizeLinks = (wiRelations)=>{
   let relCategories = {
@@ -49,13 +46,39 @@ let categorizeLinks = (wiRelations)=>{
     return relCategories;
 }//categorizeLinks
 
-let columnList = [
+class FabricFlatContainer extends Component {  
+   
+  constructor(){
+    super();
+    let  _selection;
+    this.state = {
+      columns : this.columnList
+    }
+  }//constructor
+
+  _selection = new Selection();
+  
+  styles = ()=>{
+    return {maxHeight: '100%',  overflow: 'auto'};
+  }//styles
+
+  _handleColumnReorder = (draggedIndex, targetIndex) => {
+    const draggedItems = this.state.columns[draggedIndex];
+    const newColumns = [...this.state.columns];
+
+    // insert before the dropped item
+    newColumns.splice(draggedIndex, 1);
+    newColumns.splice(targetIndex, 0, draggedItems);
+    this.setState({ columns: newColumns });
+  };//_handleColumnReorder
+
+  columnList = [
     {
       key: 'id',
       name: 'ID',
       fieldName: 'id',
       minWidth: 10,
-      maxWidth: 20,
+      maxWidth: 30,
       isResizable:true,
       ariaLabel: 'WorkItem ID',
     },
@@ -69,67 +92,121 @@ let columnList = [
       ariaLabel: 'WorkItem title',
       onRender: (item) => {
         let img = imgSelector(item.type);
-        return <TitleWrapper>
-                    <img src={img} width="30" height="30"/>
-                    <p >{item.title}</p>
-                </TitleWrapper>
+        return <Grid item xs={7}>
+        <Grid  container spacing={2}>  
+          <Grid item xs={1}  style={{'padding-top':'10'}}>
+            <img src={img} width="20" height="20"/>
+          </Grid>
+          <Grid item xs={11}>
+            <p>{item.title}</p>
+          </Grid>
+        </Grid>
+      </Grid>
       }//onRender
     },
     {
-        key: 'Links',
-        name: 'Links',
-        fieldName: 'Links',
-        minWidth: 100,
-        maxWidth: 500,
+        key: 'Parent',
+        name: 'Parent',
+        fieldName: 'Parent',
+        minWidth: 20,
+        maxWidth: 50,
         isResizable: true,
-        ariaLabel: 'WorkItem links status',
+        ariaLabel: 'WorkItem Parent links',
         onRender: (item) => {
           
           let links = categorizeLinks(item.relations);
            return( 
-              <TitleWrapper>
                 <div align='center' padding='5'>
-                  <p><strong>Parent</strong></p>
                   <p>{links.parent}</p>
                 </div>
-                <div align='center'>
-                  <p><strong>Child</strong></p>
-                  <p>{links.child}</p>
-                </div>
-                <div align='center'>
-                  <p><strong>Covers</strong></p>
-                  <p>{links.covers}</p>
-                </div>
-                <div align='center'>
-                  <p><strong>Covered by</strong></p>
-                  <p>{links.coveredBy}</p>
-                </div>
-                <div align='center'>
-                  <p><strong>Tests</strong></p>
-                  <p>{links.tests}</p>
-                </div>
-                <div align='center'>
-                  <p><strong>Tested by</strong></p>
-                  <p>{links.testedBy}</p>
-                </div>
-              </TitleWrapper>
            )
         }
+    },{
+      key: 'Children',
+      name: 'Children',
+      fieldName: 'Children',
+      minWidth: 20,
+      maxWidth: 50,
+      isResizable: true,
+      ariaLabel: 'WorkItem Parent links',
+      onRender: (item) => {
+        
+        let links = categorizeLinks(item.relations);
+         return( 
+              <div align='center' padding='0'>
+                <p>{links.child}</p>
+              </div>
+         )
+      }
+  },{
+    key: 'Covers',
+    name: 'Covers',
+    fieldName: 'Covers',
+    minWidth: 20,
+    maxWidth: 50,
+    isResizable: true,
+    ariaLabel: 'WorkItem Covers links',
+    onRender: (item) => {
+      
+      let links = categorizeLinks(item.relations);
+       return( 
+            <div align='center' padding='5'>
+              <p>{links.Covers}</p>
+            </div>
+       )
     }
+},{
+  key: 'Covered by',
+  name: 'Covered by',
+  fieldName: 'Covered by',
+  minWidth: 20,
+  maxWidth: 50,
+  isResizable: true,
+  ariaLabel: 'WorkItem Covered by links',
+  onRender: (item) => {
+    
+    let links = categorizeLinks(item.relations);
+     return( 
+          <div align='center' padding='5'>
+            <p>{links.coveredBy}</p>
+          </div>
+     )
+  }
+},{
+  key: 'Tests',
+  name: 'Tests',
+  fieldName: 'Tests',
+  minWidth: 20,
+  maxWidth: 50,
+  isResizable: true,
+  ariaLabel: 'WorkItem Tests links',
+  onRender: (item) => {
+    
+    let links = categorizeLinks(item.relations);
+     return( 
+          <div align='center' padding='5'>
+            <p>{links.tests}</p>
+          </div>
+     )
+  }
+},{
+  key: 'Tested by',
+  name: 'Tested by',
+  fieldName: 'Tested by',
+  minWidth: 20,
+  maxWidth: 50,
+  isResizable: true,
+  ariaLabel: 'WorkItem Tested by links',
+  onRender: (item) => {
+    
+    let links = categorizeLinks(item.relations);
+     return( 
+          <div align='center' padding='5'>
+            <p>{links.TestedBy}</p>
+          </div>
+     )
+  }}
   ];
-
-
-class FabricFlatContainer extends Component {  
-   
-  constructor(){
-    super();
-    let  _selection;
-  }
-  _selection = new Selection();
-  
-  styles = ()=>{
-    return {maxHeight: '100%',  overflow: 'auto'};
-  }
 
   _getDragDropEvents(){
       return {
@@ -162,25 +239,42 @@ class FabricFlatContainer extends Component {
 
   render() {
       return (
-          <div>
+        <div style={{
+          height: '100%',
+          width:'100%',
+          overflow:'true',
+          position: 'relative'
+        }}>
+          <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
               <DetailsList
                   items={this.props.wiArray}
-                  columns={columnList}
+                  columns={this.state.columns}
                   layoutMode={DetailsListLayoutMode.fixedColumns}
                   selection={this._selection}
                   dragDropEvents={this._getDragDropEvents()}
-                  styles={{root:{maxHeight: '100%',  overflow: 'auto'}}}
-                  
-                  // setKey="set"
-                  // selectionPreservedOnEmptyClick={true}
-                  // componentRef={this._detailsList}
-                  // ariaLabelForSelectionColumn="Toggle selection"
-                  // ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-                  // onItemInvoked={()=>{console.log("selected")}}
-                  />     
+                  styles={{root:{overflow: 'auto'}}}
+                  onRenderDetailsHeader={this.onRenderDetailsHeader}
+                  checkboxVisibility={CheckboxVisibility.hidden}
+                  selectionMode='none'
+                  columnReorderOptions={{
+                    frozenColumnCountFromStart: 0,
+                    frozenColumnCountFromEnd: 0,
+                    handleColumnReorder: this._handleColumnReorder
+                  }}
+                  />  
+                  </ScrollablePane>   
           </div>
       );
-  }
+  }//render
+
+  onRenderDetailsHeader(props, defaultRender){
+    return (
+      <Sticky stickyPosition={StickyPositionType.Header} isScrollSynced={true}>
+        {defaultRender({...props})}
+      </Sticky>
+    );
+  }//onRenderDetailsHeader
+
 }
 
 
