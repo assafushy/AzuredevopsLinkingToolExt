@@ -31,7 +31,7 @@ export default class TFSRestActions {
     return queryResults;
   } //getQueryResultsById
 
-  async populateWorkItemDataById(id, isParent = true,depthlvl=0,wiParentId=null) {
+  async populateWorkItemDataById(id, isParent = false,depthlvl=0,wiParentId=null) {
 
     let wiData = await this.wiClient.getWorkItem(id, null, null, this.workItemContracts.WorkItemExpand[1]);
 
@@ -76,7 +76,7 @@ export default class TFSRestActions {
             await wiPopulatedArray.push(wiData);
           }else{
             console.log(`searching for ${wi.source.id}`)
-            let i = await _.findIndex(wiPopulatedArray, (o) => {
+            let i = _.findIndex(wiPopulatedArray, (o) => {
               return o.id == wi.source.id;
             });//findIndex
             console.log(`found in index ${i}`)
@@ -87,7 +87,7 @@ export default class TFSRestActions {
               wiPopulatedArray[i].isParent = true;
               
               ///need to make the find index and the populate async to get the performance needed
-              
+             
               let wiData = await this.populateWorkItemDataById(wi.target.id,false,wiPopulatedArray[i].depth+1,wi.source.id);
               console.log(`done populating ${wi.target.id}`)
               wiPopulatedArray.push(wiData);

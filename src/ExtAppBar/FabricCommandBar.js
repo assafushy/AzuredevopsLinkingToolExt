@@ -42,6 +42,24 @@ class FabricCommandBar extends Component {
             if(containerSide == 'left'){this.props.onQuerySelectHandler(this.props.leftQueryId,containerSide);};
             if(containerSide == 'right'){this.props.onQuerySelectHandler(this.props.rightQueryId,containerSide);}
             }
+        },{
+          key: 'Expand',
+          name: 'Expand All',
+          iconProps: {
+            iconName: 'ExploreContent'
+          },
+          onClick: () => {
+            this.props.handleExpandAndCollapse('expand',containerSide)
+            }
+        },{
+          key: 'Expand',
+          name: 'Collapse All',
+          iconProps: {
+            iconName: 'CollapseContent'
+          },
+          onClick: () => {
+            this.props.handleExpandAndCollapse('collapse',containerSide)
+            }
         }
       ]; 
   }//generateQueryItems
