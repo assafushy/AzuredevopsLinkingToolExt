@@ -25,12 +25,13 @@ export default class TFSRestActions {
   } //init
 
   async getQueryResultsById(id) {
+    console.log(id);
     let queryResults = await this.wiClient.queryById(id);
     // console.log(`queryResults : ${JSON.stringify(queryResults)}`)
     return queryResults;
   } //getQueryResultsById
 
-  async populateWorkItemDataById(id, isParent = true) {
+  async populateWorkItemDataById(id, isParent = true,depthlvl=0,wiParentId=null) {
 
     let wiData = await this.wiClient.getWorkItem(id, null, null, this.workItemContracts.WorkItemExpand[1]);
 
@@ -40,8 +41,9 @@ export default class TFSRestActions {
       type: wiData.fields["System.WorkItemType"],
       url: wiData._links.html.href,
       relations: wiData.relations,
-
+      depth:depthlvl,
       isParent: isParent,
+      parentId: wiParentId,
       children: [],
       visible: true,
       isExpanded: true
@@ -51,8 +53,8 @@ export default class TFSRestActions {
   async populateQueryResult(resultsArray) {
     console.log(JSON.stringify(resultsArray));
     let wiPopulatedArray = [];
-    console.log(resultsArray)
-    switch (resultsArray.queryResultType) {
+    console.log(resultsArray.queryType)
+    switch (resultsArray.queryType) {
       case 1:
         console.log(`flat query results`);
         wiPopulatedArray = await Promise.all(resultsArray.workItems.sort((a, b) => {
@@ -63,6 +65,38 @@ export default class TFSRestActions {
         }));
         break;
       case 2:
+        console.log(`tree query results`);
+        console.log(JSON.stringify(resultsArray));
+        
+        for (let index = 0; index < resultsArray.workItemRelations.length; index++) {
+          const wi = resultsArray.workItemRelations[index];
+          if (!wi.source) {
+            let wiData = await this.populateWorkItemDataById(wi.target.id);
+            console.log(`source : ${wi.target.id}`);
+            await wiPopulatedArray.push(wiData);
+          }else{
+            console.log(`searching for ${wi.source.id}`)
+            let i = await _.findIndex(wiPopulatedArray, (o) => {
+              return o.id == wi.source.id;
+            });//findIndex
+            console.log(`found in index ${i}`)
+            if (i == -1) {
+              console.log(`No element was found!`);
+            } else {
+              console.log(`populating ${wi.target.id}`)
+              wiPopulatedArray[i].isParent = true;
+              
+              ///need to make the find index and the populate async to get the performance needed
+              
+              let wiData = await this.populateWorkItemDataById(wi.target.id,false,wiPopulatedArray[i].depth+1,wi.source.id);
+              console.log(`done populating ${wi.target.id}`)
+              wiPopulatedArray.push(wiData);
+            }
+          }          
+        }
+        console.log(wiPopulatedArray);
+        break;
+      case 3:
         console.log(`Direct Links populate function`);
         await Promise.all(resultsArray.workItemRelations.map(async (wi) => {
           if (!wi.source) {
@@ -84,20 +118,29 @@ export default class TFSRestActions {
               // console.log(i);
             } else {
               // console.log(`index is: ${i}`);
-              wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id, false));
+              wiPopulatedArray[i].children.push(await this.populateWorkItemDataById(wi.target.id, false,1));
             }
           }
         })); //map
         // console.log(JSON.stringify(wiPopulatedArray));
         break;
-      case 3:
-        console.log(`tree query results`);
-        console.log(JSON.stringify(resultsArray));
       default:
         break;
     }
     return wiPopulatedArray;
   } //populateQueryResult
+
+  async iterateWorkItemsArray(WIarray,wi){
+    WIarray.forEach(async (element,index)=>{
+      if(WIarray[index].id === wi.source.id){
+        WIarray[index].children.push(await this.populateWorkItemDataById(wi.target.id,false,1))
+      }//if
+      if(WIarray[index].children){
+        WIarray[index].children = this.iterateWorkItemsArray(WIarray[index].children,wi);
+      }//if
+    })//foEach  
+    return WIarray;
+  }//iterateWorkItemsArray
 
   async fetchSharedQueriesData() {
     return new Promise(async (resolve, reject) => {

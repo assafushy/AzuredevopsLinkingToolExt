@@ -8,6 +8,7 @@ import TFSRestActions from './Actions/TFSRestActions';
 import Snackbar from '@material-ui/core/Snackbar';
 import 'react-sortable-tree/style.css';
 import FabricFlatContainer from './BacklogContainer/FabricFlatContainer';
+import FabricTreeContainer from './FabricTreeContainer/FabricTreeContainer';
 
 let tfsData = new TFSRestActions();
     
@@ -48,6 +49,14 @@ export default class App extends Component {
                 handleDragEnd={this.handleDragEnd.bind(this)} 
                 handleDropEvent={this.handleDropEvent.bind(this)}/> 
       case 2:
+        return <FabricTreeContainer 
+                containerSide='left'
+                wiArray = {this.state.leftContainerWiArray}
+                handleDragEvent={this.handleDragEvent.bind(this)} 
+                handleDragEnd={this.handleDragEnd.bind(this)} 
+                handleDropEvent={this.handleDropEvent.bind(this)}
+                handleToggleVisible={this.toggleVisibilityTree.bind(this)}/>;  
+      case 3:
         return <FabricDirectLinksContainer 
                 containerSide='left'
                 wiArray = {this.state.leftContainerWiArray}
@@ -70,7 +79,7 @@ export default class App extends Component {
                 handleDragEvent={this.handleDragEvent.bind(this)}
                 handleDragEnd={this.handleDragEnd.bind(this)}  
                 handleDropEvent={this.handleDropEvent.bind(this)}/>;
-      case 2:
+      case 3:
         return <FabricDirectLinksContainer 
                 containerSide='right'
                 wiArray = {this.state.rightContainerWiArray}
@@ -203,17 +212,17 @@ export default class App extends Component {
     //console.log(conatainerSide);
     let queryResults = await tfsData.getQueryResultsById(id);
    
-    //console.log(queryResults);
+    console.log(queryResults);
     let wiArray = await tfsData.populateQueryResult(queryResults);
     
     //console.log(wiArray)
     if(conatainerSide === "left"){
-      this.setState({'leftQueryResultType':queryResults.queryResultType});
+      this.setState({'leftQueryResultType':queryResults.queryType});
       this.setState({'leftContainerWiArray':wiArray});
       this.setState({'leftQueryId':id});
-      console.log(`leftQueryResult Type is : ${this.state.leftQueryResultType}`);
+      console.log(`leftQuery Type is : ${this.state.queryType}`);
     }else{
-      this.setState({'rightQueryResultType':queryResults.queryResultType});
+      this.setState({'rightQueryResultType':queryResults.queryType});
       this.setState({'rightContainerWiArray':wiArray});
       this.setState({'rightQueryId':id});
     }//if
@@ -240,6 +249,40 @@ export default class App extends Component {
           wi.visible=true;
         }//if
       });//foreach
+    }//if
+    
+    this.setState({leftContainerWiArray:visibleUpdateWiArray});
+  }//toggleVisibility
+
+
+  toggleVisibilityTree(wiId,containerSide){
+    let visibleUpdateWiArray;
+    if(containerSide === 'left'){visibleUpdateWiArray = this.state.leftContainerWiArray;}
+    if(containerSide === 'right'){visibleUpdateWiArray = this.state.rightContainerWiArray;}
+    
+    let indexToToggle = _.findIndex(visibleUpdateWiArray,(o)=>{return o.id == wiId});
+    
+    if (indexToToggle != -1) {
+      
+      if(visibleUpdateWiArray[indexToToggle].isExpanded){
+        visibleUpdateWiArray[indexToToggle].isExpanded=false
+      }else{
+        visibleUpdateWiArray[indexToToggle].isExpanded=true;
+      }//if
+
+      visibleUpdateWiArray.forEach(wi => {
+        if(wi.parentId === wiId){
+          
+          if(wi.visible){
+            wi.visible=false;
+          }else{
+            wi.visible=true;
+          }//if
+        
+        }//if
+      
+      });//foreach
+
     }//if
     
     this.setState({leftContainerWiArray:visibleUpdateWiArray});
