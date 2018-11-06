@@ -8,6 +8,8 @@ import reviewImg from './img/reviewImg.png';
 import riskImg from './img/riskImg.png';  
 import taskImg from './img/taskImg.png';  
 import testImg from './img/testImg.png';
+import userImg from './img/userStoryImg.png';
+
 
 export function imgSelector(wiType){
     
@@ -24,6 +26,8 @@ export function imgSelector(wiType){
       return issuImg;
     case 'Requirement':
       return reqImg;
+    case 'User Story':
+      return userImg;
     case 'Review':
       return reviewImg;
     case 'Risk':
