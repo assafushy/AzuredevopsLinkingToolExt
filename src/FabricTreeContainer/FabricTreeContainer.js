@@ -120,7 +120,9 @@ class FabricTreeContainer extends Component {
                           <img src={img} width="20" height="20"/>
                         </Grid>
                         <Grid item xs={11}>
-                          <p>{item.title}</p>
+                          <a target="_blank" href={item.url}>
+                            <p>{item.title}</p>
+                          </a>
                         </Grid>
                       </Grid>
                     </Grid>

@@ -98,7 +98,9 @@ class FabricFlatContainer extends Component {
             <img src={img} width="20" height="20"/>
           </Grid>
           <Grid item xs={11}>
+          <a target="_blank" href={item.url}>
             <p>{item.title}</p>
+          </a>
           </Grid>
         </Grid>
       </Grid>
