@@ -1,7 +1,6 @@
 import React,{Component} from 'react';
-
 import { CommandBar} from 'office-ui-fabric-react/lib/CommandBar';
-import { Layer } from 'office-ui-fabric-react/lib/Layer';
+
 
 
 class FabricCommandBar extends Component {
@@ -67,9 +66,10 @@ class FabricCommandBar extends Component {
   render() {
     return (
       <div>
-        <Layer width="auto">
-          <p align = "center"><strong>Work Items DnD Linking Tool - (Default link - Child of | Hold down Ctrl - Tests | Hold down Shift - Covers)</strong> </p>
-        </Layer>
+        <div align="center" background-color="rgb(244, 244, 244)">
+        <br/>
+          <strong padding="10" margin="10">Work Items DnD Linking Tool - (Default link - Child of | Hold down Ctrl - Tests | Hold down Shift - Covers)</strong>
+        </div>
          <CommandBar
           items={this.generateQueryItems(this.props.queryList,"left")}       
           farItems={this.generateQueryItems(this.props.queryList,"right")}
